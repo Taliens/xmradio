@@ -46,7 +46,7 @@
 #	define XMR_NAMESPACE xmrns
 #	define XMR_BEGIN_NS namespace XMR_NAMESPACE {
 #	define XMR_END_NS }
-#	define XMR_USE_NS using namespace XMR_NAMESPACE
+#	define XMR_USE_NS using namespace XMR_NAMESPACE;
 #else
 #	define XMR_NAMESPACE
 #	define XMR_BEGIN_NS
