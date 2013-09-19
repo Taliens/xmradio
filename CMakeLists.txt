@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(xmradio)
 
-set(version 0.4.4)
+set(version 1.0)
 
 set(XMR_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_MODULE_PATH ${XMR_CMAKE_PATH} ${CMAKE_MODULE_PATH})
@@ -17,42 +17,21 @@ endif()
 
 # uninstall target
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
+	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+	IMMEDIATE @ONLY)
 
 add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+	COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
-option(NLS	"Native language support"  ON)
 option(WARN_AS_ERROR "Warning as error" ON)
 option(BUILD_TEST "Build tests" OFF)
 option(ENABLE_ASAN "Build with Address-Sanitizer if gcc >= 4.8 or clang >= 3.1" OFF)
 
 include(CheckIncludeFiles)
-include(FindPkgConfig)
-
-check_include_files(unistd.h HAVE_UNISTD_H)
-check_include_files(malloc.h HAVE_MALLOC_H)
-check_include_files(X11/XF86keysym.h HAVE_MMKEYS_H)
-
-find_program(GLIB_GENMARSHAL
-	NAMES glib-genmarshal
-	DOC "glib-genmarshal executable"
-)
-
-mark_as_advanced(GLIB_GENMARSHAL)
-
-if (NLS)
-	FIND_PACKAGE(Gettext REQUIRED)
-endif(NLS)
-
-if (NLS AND GETTEXT_FOUND)
-	set(ENABLE_NLS TRUE)
-	message(STATUS "Native language support:  YES")
-else(NLS AND GETTEXT_FOUND)
-	message(STATUS "Native language support:  NO")
-endif(NLS AND GETTEXT_FOUND)
+if (NOT WIN32)
+	include(FindPkgConfig)
+endif()
 
 set(package	xmradio)
 set(prefix	${CMAKE_INSTALL_PREFIX})
@@ -75,8 +54,13 @@ set(plugindatadir ${pkgdatadir}/plugins)
 set(PLUGIN_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/plugins)
 
 if (WARN_AS_ERROR)
-	set(CMAKE_C_FLAGS "-Wall -Werror ${CMAKE_C_FLAGS}")
-	set(CMAKE_CXX_FLAGS "-Wall -Werror ${CMAKE_CXX_FLAGS}")
+	if (WIN32)
+		set(CMAKE_C_FLAGS "/WX ${CMAKE_C_FLAGS}")
+		set(CMAKE_CXX_FLAGS "/WX ${CMAKE_CXX_FLAGS}")
+	else()
+		set(CMAKE_C_FLAGS "-Wall -Werror ${CMAKE_C_FLAGS}")
+		set(CMAKE_CXX_FLAGS "-Wall -Werror ${CMAKE_CXX_FLAGS}")
+	endif()
 endif(WARN_AS_ERROR)
 
 if (ENABLE_ASAN)
@@ -100,6 +84,8 @@ if (ENABLE_ASAN)
 			set(CMAKE_C_FLAGS "-fsanitize=address -fno-omit-frame-pointer ${CMAKE_C_FLAGS}")
 			set(CMAKE_CXX_FLAGS "-fsanitize=address -fno-omit-frame-pointer ${CMAKE_CXX_FLAGS}")
 		endif()
+	else()
+		message("Your compiler doesn't support Address-Sanitizer feature.")
 	endif()
 endif(ENABLE_ASAN)
 
@@ -111,6 +97,15 @@ endif()
 set(XMR_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/xmradio)
 set(EXECUTABLE_OUTPUT_PATH ${XMR_OUTPUT_PATH})
 set(LIBRARY_OUTPUT_PATH ${XMR_OUTPUT_PATH})
+
+if (WIN32)
+	foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+		string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${XMR_OUTPUT_PATH})
+		set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${XMR_OUTPUT_PATH})
+		set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${XMR_OUTPUT_PATH})
+	endforeach()
+endif()
 
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 

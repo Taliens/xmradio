@@ -88,7 +88,7 @@ private:
 	static void vlc_event_callback(const struct libvlc_event_t *event, void *userdata);
 
 private:
-	std::vector<Event> _eventList;
+	std::vector<Event> *_eventList;
 	callback_t _callback;
 	void *_userdata;
 

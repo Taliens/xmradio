@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include <ctime>
 #include <cstdio>
 #include <cstdarg>
@@ -8,6 +7,23 @@
 
 XMR_USE_NS
 using namespace std;
+
+#ifdef X_OS_WIN
+
+#include <Windows.h>
+
+#define snprintf _snprintf
+
+static void sleep(int secs)
+{
+	Sleep(secs * 1000);
+}
+
+#else
+
+#include <unistd.h>
+
+#endif // X_OS_WIN
 
 static string cur_time()
 {

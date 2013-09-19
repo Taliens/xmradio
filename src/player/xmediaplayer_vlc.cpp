@@ -61,12 +61,16 @@ XMediaPlayerVlc::XMediaPlayerVlc()
 
 	_player = libvlc_media_player_new(_instance);
 	assert(_player != NULL);
+	
+	_eventList = new std::vector<Event>();
 }
 
 XMediaPlayerVlc::~XMediaPlayerVlc()
 {
-	while(!_eventList.empty())
-		unwatch(_eventList[0]);
+	while(!_eventList->empty())
+		unwatch(_eventList->at(0));
+
+	delete _eventList;
 
 	stop();
 	libvlc_media_player_release(_player);
@@ -229,9 +233,9 @@ bool XMediaPlayerVlc::watch(XMediaPlayer::Event type)
 		return false;
 	
 	std::vector<Event>::iterator it;
-	it = std::find(_eventList.begin(), _eventList.end(), type);
+	it = std::find(_eventList->begin(), _eventList->end(), type);
 	// already exists
-	if (it != _eventList.end())
+	if (it != _eventList->end())
 		return false;
 
 	if (type == PlayerStateChanged)
@@ -249,7 +253,7 @@ bool XMediaPlayerVlc::watch(XMediaPlayer::Event type)
 			return false;
 	}
 	
-	_eventList.push_back(type);
+	_eventList->push_back(type);
 
 	return true;
 }
@@ -261,8 +265,8 @@ void XMediaPlayerVlc::unwatch(XMediaPlayer::Event type)
 		return ;
 
 	std::vector<Event>::iterator it;
-	it = std::find(_eventList.begin(), _eventList.end(), type);
-	if (it == _eventList.end())
+	it = std::find(_eventList->begin(), _eventList->end(), type);
+	if (it == _eventList->end())
 		return ;
 
 	if (type == PlayerStateChanged)
@@ -276,7 +280,7 @@ void XMediaPlayerVlc::unwatch(XMediaPlayer::Event type)
 		libvlc_event_detach(em, x2v(type), vlc_event_callback, this);
 	}
 
-	_eventList.erase(it);
+	_eventList->erase(it);
 }
 
 std::string XMediaPlayerVlc::errorString() const
