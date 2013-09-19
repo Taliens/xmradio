@@ -54,7 +54,7 @@ set(plugindatadir ${pkgdatadir}/plugins)
 set(PLUGIN_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/plugins)
 
 if (WARN_AS_ERROR)
-	if (WIN32)
+	if (MSVC)
 		set(CMAKE_C_FLAGS "/WX ${CMAKE_C_FLAGS}")
 		set(CMAKE_CXX_FLAGS "/WX ${CMAKE_CXX_FLAGS}")
 	else()
