@@ -33,11 +33,9 @@ target_link_libraries(xmrplayer
 	${LIBVLC_LIBRARIES}
 )
 
-set(PLAYER_VERSION 1.0)
-
 set_target_properties(xmrplayer
-	PROPERTIES VERSION ${PLAYER_VERSION}
-	SOVERSION 0
+	PROPERTIES VERSION "1.0.0"
+	SOVERSION 1
 )
 
 if (NOT WIN32)

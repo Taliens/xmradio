@@ -99,7 +99,7 @@ public:
 		PlayerTimeChanged
 	};
 
-	typedef void( *callback_t)(Event, void *);
+	typedef void (*callback_t)(Event, void *);
 	virtual void setEventCallback(callback_t callback, void *data) = 0;
 
 	virtual bool watch(Event type) = 0;
