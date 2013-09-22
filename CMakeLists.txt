@@ -25,7 +25,7 @@ add_custom_target(uninstall
 	COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
 option(WARN_AS_ERROR "Warning as error" ON)
-option(BUILD_TEST "Build tests" OFF)
+option(BUILD_TEST "Build tests" ON)
 option(ENABLE_ASAN "Build with Address-Sanitizer if gcc >= 4.8 or clang >= 3.1" OFF)
 
 include(CheckIncludeFiles)
@@ -62,6 +62,16 @@ if (WARN_AS_ERROR)
 		set(CMAKE_CXX_FLAGS "-Wall -Werror ${CMAKE_CXX_FLAGS}")
 	endif()
 endif(WARN_AS_ERROR)
+
+if (MSVC)
+	set(WARNING_NUMBERS
+		4251
+	)
+	foreach(n ${WARNING_NUMBERS})
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd${n}")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd${n}")
+	endforeach()
+endif()
 
 if (ENABLE_ASAN)
 	if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
