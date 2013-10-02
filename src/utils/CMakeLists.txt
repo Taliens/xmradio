@@ -3,6 +3,8 @@ include_directories(. ..)
 
 set(xmrutils_SRC
 	utils_export.h
+	utils.h
+	utils.cpp
 	xlibhelper.h
 	xlibhelper.cpp
 )
